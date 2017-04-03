@@ -1,0 +1,197 @@
+%-------------
+% PACKAGES %%
+%-------------
+\documentclass[12pt]{article}
+\usepackage[english]{babel}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[nottoc,numbib]{tocbibind}
+\usepackage[parfill]{parskip}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{%frame=tb,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=false,
+  breakatwhitespace=false,
+  tabsize=4,
+  morekeywords={FIR_H_BUFFER,dsp16_t,dsp16_filt_iirpart}
+}
+
+\lstset{emph={%  
+    DSP16_Q,H_SIZE%
+    },emphstyle={\color{mauve}}%
+}
+
+
+\usepackage{eso-pic}
+\newcommand\BackgroundPic{%
+\put(0,0){%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\centering
+\advance\leftskip 2.0cm
+\includegraphics[width=\paperwidth,height=\paperheight,%
+keepaspectratio]{logogreyLarge.jpg}%
+\vspace*{-30pt}
+\vfill
+}}}
+
+
+
+\begin{document}
+\AddToShipoutPicture*{\BackgroundPic}
+
+%-------------------------
+%	uncomment irrelevant 
+%	parts, like logo etc
+%-------------------------
+\pagenumbering{Alph}
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\begin{center}
+%---------------------
+%	HEADING SECTIONS
+%---------------------
+\textsc{\LARGE Uppsala University}\\[1.5cm] % Name of your university/college
+\textsc{\Large Programming Embedded Systems, Project}\\[0.5cm] % Major heading such as course name
+\textsc{\large }\\[0.5cm] % Minor heading such as course title
+
+%------------------
+%	TITLE SECTION
+%------------------
+\HRule \\[0.4cm]
+{ \huge \bfseries Baddass Alarm System, \\ The Movie}\\[0.4cm] % Title of your document
+\HRule \\[1.5cm]
+ 
+%--------------------
+%	AUTHOR SECTION
+%--------------------
+% \begin{minipage}{1.4\textwidth}
+% \begin{flushleft} 
+
+\large\emph{Authors:}\\Billman, Linnar \\ Hietarinta, Daniel \\ Vilic, Husein\\
+						[1.0cm]%
+
+
+% \end{flushleft}
+% \end{minipage}
+
+%---------------------
+%	Supervisor
+%---------------------
+% \begin{minipage}{0.4\textwidth}
+% \begin{flushright} \large
+% \emph{Supervisor:} \\
+% Dr. James \textsc{Smith} % Supervisor's Name
+% \end{flushright}
+% \end{minipage}\\[2cm]
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+%\Large \emph{Author:}\\
+%John \textsc{Smith}\\[3cm] % Your name
+
+{\large \today}\\[2cm] % Date
+
+%----------
+%	LOGO 
+%----------
+%\includegraphics[width=2in]{logga.png}\\%[1cm]
+\end{center}
+\end{titlepage}
+\pagenumbering{arabic}
+\pagebreak
+%-------------------------
+%	Table of Contents
+%-------------------------
+\tableofcontents
+\pagebreak
+
+\begin{abstract}
+  \input{abstract/abstract}
+\end{abstract}
+\pagebreak
+%\mainmatter
+
+\section{Introduction} % (fold)
+\label{sec:introduction}
+  \input{introduction/introduction}
+% section introduction (end)
+
+\section{Background} % (fold)
+\label{sec:background}
+  \input{background/background}
+% section background (end)
+
+\section{Purpose, Aim and Motivation}
+\label{sec:purpose}
+  \input{purpose/purpose}
+% section purpose, aim and motivation (end)
+
+\section{Related Work}
+\label{sec:relatedwork}
+  \input{relatedwork/relatedwork} 
+% section related work (end)
+
+\section{Methods} % (fold)
+\label{sec:methods}
+  \input{methods/methods}
+% section methods (end)
+
+\section{System Structure}
+\label{sec:systemstructure}
+  \input{systemstructure/systemstructure}
+% section system structure (end)
+
+\section{Implementation}
+\label{sec:implementation}
+  \input{implementation/implementation}
+% section implementation (end)
+
+\section{Results and Discussion} % (fold)
+\label{sec:results_and_discussion}
+  \input{results/resultsanddiscussion}
+% section results and discussion (end)
+
+\section{Conclusions}
+\label{sec:conclusions}
+  \input{conclusions/conclusions}
+% section conclusions (end)
+
+\section{Future Work}
+\label{sec:futurework}
+  \input{futurework/futurework}
+% section future work (end)
+\newpage
+% Use one of these.
+% \bibliographystyle{alpha}
+
+\bibliography{introduction/introductionref,background/backgroundref,methods/methodref,relatedwork/relatedworkref,purpose/purposeref,systemstructure/systemstructureref,futurework/futureworkref,results/resultsref}
+\bibliographystyle{ieeetr}%IEEEtranS}
+
+\end{document}
+
+\end{document}
