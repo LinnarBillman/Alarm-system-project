@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include "contiki.h"
 #include "dev/leds.h"
@@ -8,15 +7,23 @@
 #define LED_INT_ONTIME        (CLOCK_SECOND / 2)
 #define ACCM_READ_INTERVAL    CLOCK_SECOND
 /*---------------------------------------------------------------------------*/
+
+
+
 static process_event_t led_off_event;
 static struct etimer led_etimer;
 static struct etimer et;
-int i = 0;
+int j = 0;
+int16_t temp = 0;
+
+struct message {
+	int16_t num;
+};
+
 /*---------------------------------------------------------------------------*/
 PROCESS(accel_process, "Test Accel process");
 PROCESS(led_process, "LED handling process");
-PROCESS(broadcast_process, "Broadcast process");
-AUTOSTART_PROCESSES(&accel_process, &led_process,&broadcast_process);
+AUTOSTART_PROCESSES(&accel_process, &led_process);
 /*---------------------------------------------------------------------------*/
 /* As several interrupts can be mapped to one interrupt pin, when interrupt
  * strikes, the adxl345 interrupt source register is read. This function prints
@@ -24,6 +31,19 @@ AUTOSTART_PROCESSES(&accel_process, &led_process,&broadcast_process);
  * even those mapped to 'the other' pin, and those that will always signal even
  * if not enabled (such as watermark).
  */
+
+
+static void recv(struct broadcast_conn *c, const linkaddr_t *from)
+{
+	struct message *m;
+	m = packetbuf_dataptr();
+	printf("Received broadcast from %d.%d with value %d\n", from->u8[0], from->u8[1], m->num);
+
+}
+static const struct broadcast_callbacks broadcast_call = {recv};
+static struct broadcast_conn broadcast;
+
+
 void
 print_int(uint16_t reg)
 {
@@ -50,7 +70,6 @@ print_int(uint16_t reg)
 void
 accm_ff_cb(uint8_t reg)
 {
-  i = 1;
   leds_on(LEDS_BLUE);
   process_post(&led_process, led_off_event, NULL);
   printf("~~[%u] Freefall detected! (0x%02X) -- ",
@@ -76,21 +95,6 @@ accm_tap_cb(uint8_t reg)
   print_int(reg);
 }
 /*---------------------------------------------------------------------------*/
-
-static void
-broadcast_recv(struct broadcast_conn *c,const linkaddr_t *from)
-{
-
- printf("broadcast message received from %d.%d: '%s'\n",
-         from->u8[0], from->u8[1], (char *)packetbuf_dataptr());
-
-}
-/* This is where we define what function to be called when a broadcast
-   is received. We pass a pointer to this structure in the
-   broadcast_open() call below. */
-static const struct broadcast_callbacks broadcast_call = {broadcast_recv};
-static struct broadcast_conn broadcast;
-/*---------------------------------------------------------------------------*/
 PROCESS_THREAD(led_process, ev, data) {
   PROCESS_BEGIN();
   while(1) {
@@ -105,11 +109,12 @@ PROCESS_THREAD(led_process, ev, data) {
 /* Main process, setups  */
 PROCESS_THREAD(accel_process, ev, data)
 {
+  PROCESS_EXITHANDLER(broadcast_close(&broadcast));
   PROCESS_BEGIN();
-
+  broadcast_open(&broadcast, 130, &broadcast_call);
 
   int16_t x, y, z;
-
+  struct message m;	
   /* Register the event used for lighting up an LED when interrupt strikes. */
   led_off_event = process_alloc_event();
 
@@ -127,44 +132,32 @@ PROCESS_THREAD(accel_process, ev, data)
    * adxl345 datasheet.
    */
   accm_set_irq(ADXL345_INT_FREEFALL, ADXL345_INT_TAP + ADXL345_INT_DOUBLETAP);
+     
+  temp = adxl345.value(X_AXIS);
+  temp = temp - 107;
+  printf("temp: %d\n", temp);
 
   while(1) {
+    
+  
+    
     x = adxl345.value(X_AXIS);
     y = adxl345.value(Y_AXIS);
     z = adxl345.value(Z_AXIS);
     printf("x: %d y: %d z: %d\n", x, y, z);
-
+	
+	if(((temp+15) <x) || ((temp-15) > x)){
+		 m.num = 1;
+		 packetbuf_copyfrom(&m, sizeof(struct message));
+   		 broadcast_send(&broadcast);
+    		 printf("sheit\n");
+		 temp = x;
+	}
+	
     etimer_set(&et, ACCM_READ_INTERVAL);
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
+    
   }
 
   PROCESS_END();
 }
-/*---------------------------------------------------------------------------*/
-
-
-PROCESS_THREAD(broadcast_process, ev, data)
-{
-
- 
-  PROCESS_EXITHANDLER(broadcast_close(&broadcast));
-
-  PROCESS_BEGIN();
-
-  broadcast_open(&broadcast, 130, &broadcast_call);
-
- 
-  while(1) {
-    if (i == 1){
-	i=0;
-	packetbuf_copyfrom("Hello", 6);
-    	broadcast_send(&broadcast);
-    	printf("broadcast message sent\n");
-     }
-   
-  }
-
-
-  PROCESS_END();
-}
-
