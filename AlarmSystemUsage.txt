@@ -1,0 +1,15 @@
+Alarm system usage:
+Plug in base station (address 124) to top right usb port
+Start sensor nodes (can also plug in to usb port)
+
+--Shell script--
+Open terminal and navigate to /Desktop/Alarm-sytem-project/
+Run 'sudo perl serial-log.pl'
+Open terminal and navigate to /Desktop/contiki/examples/rime/
+Run 'sudo make login'
+Press ctrl+C after it reads [OK]
+Navigate to /Desktop/Alarm-sytem-project/
+Run 'sudo java -jar AlarmSystemServer.jar 4444'
+--Shell script--
+
+Start app on phone

@@ -4,7 +4,7 @@
 #include "net/rime/rime.h"
 
 #define INTERVAL (CLOCK_SECOND / 0.5)
-#define THRESHOLD 40
+#define THRESHOLD 15
 
 struct message {
 	int16_t temp;
@@ -31,12 +31,15 @@ PROCESS_THREAD(temp_process, ev, data) {
 	
 	static struct etimer et;
 	struct message m;
+
 	SENSORS_ACTIVATE(tmp102);
 	
 	while(1) {
 		etimer_set(&et, INTERVAL);
 		PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-		m.temp = tmp102.value(TMP102_READ);
+		m.temp = tmp102_read_temp_raw();
+		m.temp = (m.temp >> 8);
+		//m.temp = tmp102.value(TMP102_READ);
 		printf("temp is: %d\n", m.temp);
 		
 		if(m.temp >= THRESHOLD) {

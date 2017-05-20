@@ -150,7 +150,7 @@ PROCESS_THREAD(accel_process, ev, data)
 		 m.num = 1;
 		 packetbuf_copyfrom(&m, sizeof(struct message));
    		 broadcast_send(&broadcast);
-    		 printf("sheit\n");
+    		 printf("broadcasting\n");
 		 temp = x;
 	}
 	

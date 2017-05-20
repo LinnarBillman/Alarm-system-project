@@ -1,16 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "contiki.h"
-#include "net/rime.h"
+#include "net/rime/rime.h"
 #include "dev/leds.h"
-#include "dev/cc2420.h"
 
-#if 1
-#define PRINTF(...) printf(__VA_ARGS__)
-#else
-#define PRINTF(...)
-#endif
-
+struct message {
+	int8_t temp;
+};
 
 /* Declare our "main" process, the basestation_process */
 PROCESS(basestation_process, "node basestation");
@@ -18,18 +14,22 @@ PROCESS(basestation_process, "node basestation");
  * the node has booted. */
 AUTOSTART_PROCESSES(&basestation_process);
 
-
 int busy = 0;
 
-static void recv(struct broadcast_conn *c, const rimeaddr_t *from) {
-	while(busy);
-	busy = 1;
-	//char* recvString = (char*)packetbuf_dataptr();
-	//int recvStringLen = strlen(recvString);
-	PRINTF("%d %s\n",from->u8[0],(char*)packetbuf_dataptr());
-	leds_toggle(LEDS_ALL);
-	busy = 0;
+static void recv(struct broadcast_conn *c, const linkaddr_t *from) {
+	struct message *m;
+	m = packetbuf_dataptr();
+
+	//printf("Received broadcast from %d.%d with value %d\n", from->u8[0], from->u8[1], m->temp);
+	//printf("Temperature is above threshold (%d degrees)\n", m->temp);
+	printf("Accelerometer has detected movement          \n");
+
+	/*if(from->u8[0] == 140) {
+		char* value = packetbuf_dataptr();
+		printf("Received broadcast from %d.%d with value %s\n", from->u8[0], from->u8[1], value);
+	}*/
 }
+
 /* Broadcast handle to receive and send (identified) broadcast
  * packets. */
 static struct broadcast_conn bc;
@@ -39,12 +39,6 @@ static struct broadcast_callbacks bc_callback = { recv };
 /* Our main process. */
 PROCESS_THREAD(basestation_process, ev, data) {
 	PROCESS_BEGIN();
-	/* Open the broadcast handle, use the rime channel
-	 * defined by CLICKER_CHANNEL. */
 	broadcast_open(&bc, 130, &bc_callback);
-	/* Set the radio's channel to IEEE802_15_4_CHANNEL */
-	cc2420_set_channel(16);
-	/* Set the radio's transmission power. */
-	cc2420_set_txpower(30);
 	PROCESS_END();
 }
