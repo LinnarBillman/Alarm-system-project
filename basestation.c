@@ -5,7 +5,7 @@
 #include "dev/leds.h"
 
 struct message {
-	int8_t temp;
+	int8_t num;
 };
 
 /* Declare our "main" process, the basestation_process */
@@ -22,7 +22,13 @@ static void recv(struct broadcast_conn *c, const linkaddr_t *from) {
 
 	//printf("Received broadcast from %d.%d with value %d\n", from->u8[0], from->u8[1], m->temp);
 	//printf("Temperature is above threshold (%d degrees)\n", m->temp);
-	printf("Accelerometer has detected movement          \n");
+	
+	if(m->num == 2){
+		printf("Accelerometer has detected movement          \n");
+	}else{
+		printf("Temp sensor has detected fire                \n");
+	}
+	
 
 	/*if(from->u8[0] == 140) {
 		char* value = packetbuf_dataptr();

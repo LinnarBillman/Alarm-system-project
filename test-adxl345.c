@@ -147,7 +147,7 @@ PROCESS_THREAD(accel_process, ev, data)
     printf("x: %d y: %d z: %d\n", x, y, z);
 	
 	if(((temp+15) <x) || ((temp-15) > x)){
-		 m.num = 1;
+		 m.num = 2;
 		 packetbuf_copyfrom(&m, sizeof(struct message));
    		 broadcast_send(&broadcast);
     		 printf("broadcasting\n");
