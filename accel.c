@@ -3,56 +3,36 @@
 #include "dev/leds.h"
 #include "dev/adxl345.h"
 #include "net/rime/rime.h"
+#include "common.h"
 /*---------------------------------------------------------------------------*/
 #define LED_INT_ONTIME        (CLOCK_SECOND / 2)
 #define ACCM_READ_INTERVAL    CLOCK_SECOND
 /*---------------------------------------------------------------------------*/
 
-
-
 static process_event_t led_off_event;
 static struct etimer led_etimer;
-static struct etimer et;
 int j = 0;
-int onFlag = 1;
 
 int16_t temp = 0;
 
-struct message {
-  int8_t id;
-  int8_t num;
-};
-
-/*---------------------------------------------------------------------------*/
 PROCESS(accel_process, "Test Accel process");
 PROCESS(led_process, "LED handling process");
 AUTOSTART_PROCESSES(&accel_process, &led_process);
-/*---------------------------------------------------------------------------*/
-/* As several interrupts can be mapped to one interrupt pin, when interrupt
- * strikes, the adxl345 interrupt source register is read. This function prints
- * out which interrupts occurred. Note that this will include all interrupts,
- * even those mapped to 'the other' pin, and those that will always signal even
- * if not enabled (such as watermark).
- */
-
 
 static void recv(struct broadcast_conn *c, const linkaddr_t *from)
 {
 	struct message *m;
 	m = packetbuf_dataptr();
-	printf("Received broadcast from %d.%d with value %d\n", from->u8[0], from->u8[1], m->num);
-  if(m->id==0){
-    if(m->num==1){
-      onFlag = 1;
-    }else if(m->num==0){
-      onFlag = 0;
-    }
-  }
-
+	printf("Received broadcast from %d.%d with value %d\n", from->u8[0], from->u8[1], m->msg);
+	if(m->id == BASESTATION){
+	    if(m->msg == SENSOR_ON){
+	      onFlag = 1;
+	    }else if(m->msg == SENSOR_OFF){
+	      onFlag = 0;
+	    }
+  	}
 }
 static const struct broadcast_callbacks broadcast_call = {recv};
-static struct broadcast_conn broadcast;
-
 
 void
 print_int(uint16_t reg)
@@ -148,7 +128,6 @@ PROCESS_THREAD(accel_process, ev, data)
   printf("temp: %d\n", temp);
 
   while(1) {
-    printf("%d\n", onFlag);
     if(onFlag){
       x = adxl345.value(X_AXIS);
       y = adxl345.value(Y_AXIS);
@@ -156,11 +135,11 @@ PROCESS_THREAD(accel_process, ev, data)
       printf("x: %d y: %d z: %d\n", x, y, z);
     	
     	if(((temp+15) <x) || ((temp-15) > x)){
-    		 m.num = 2;
+    		 m.msg = 2;
 		 m.id = 1;
     		 packetbuf_copyfrom(&m, sizeof(struct message));
        		 broadcast_send(&broadcast);
-        		 printf("broadcasting\n");
+		 printf("broadcasting\n");
     		 temp = x;
     	}
     }
