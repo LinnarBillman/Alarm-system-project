@@ -14,9 +14,12 @@ static process_event_t led_off_event;
 static struct etimer led_etimer;
 static struct etimer et;
 int j = 0;
+int onFlag = 1;
+
 int16_t temp = 0;
 
 struct message {
+  int id;
 	int16_t num;
 };
 
@@ -38,6 +41,13 @@ static void recv(struct broadcast_conn *c, const linkaddr_t *from)
 	struct message *m;
 	m = packetbuf_dataptr();
 	printf("Received broadcast from %d.%d with value %d\n", from->u8[0], from->u8[1], m->num);
+  if(m->id==0){
+    if(m->num==1){
+      onFlag = 1;
+    }else if(m->num==0){
+      onFlag = 0;
+    }
+  }
 
 }
 static const struct broadcast_callbacks broadcast_call = {recv};
@@ -139,21 +149,21 @@ PROCESS_THREAD(accel_process, ev, data)
 
   while(1) {
     
-  
-    
-    x = adxl345.value(X_AXIS);
-    y = adxl345.value(Y_AXIS);
-    z = adxl345.value(Z_AXIS);
-    printf("x: %d y: %d z: %d\n", x, y, z);
-	
-	if(((temp+15) <x) || ((temp-15) > x)){
-		 m.num = 2;
-		 packetbuf_copyfrom(&m, sizeof(struct message));
-   		 broadcast_send(&broadcast);
-    		 printf("broadcasting\n");
-		 temp = x;
-	}
-	
+    if(onFlag){
+      x = adxl345.value(X_AXIS);
+      y = adxl345.value(Y_AXIS);
+      z = adxl345.value(Z_AXIS);
+      printf("x: %d y: %d z: %d\n", x, y, z);
+    	
+    	if(((temp+15) <x) || ((temp-15) > x)){
+    		 m.num = 2;
+    		 packetbuf_copyfrom(&m, sizeof(struct message));
+       		 broadcast_send(&broadcast);
+        		 printf("broadcasting\n");
+    		 temp = x;
+    	}
+    }
+  	
     etimer_set(&et, ACCM_READ_INTERVAL);
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
     
