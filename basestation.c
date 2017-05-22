@@ -6,7 +6,7 @@
 #include "dev/button-sensor.h"
 
 struct message {
-	int id;
+	int8_t id;
 	int8_t num;
 };
 
@@ -26,7 +26,9 @@ static void recv(struct broadcast_conn *c, const linkaddr_t *from) {
 
 	//printf("Received broadcast from %d.%d with value %d\n", from->u8[0], from->u8[1], m->temp);
 	//printf("Temperature is above threshold (%d degrees)\n", m->temp);
-	
+
+	printf("%d\n", m->id);	
+
 	if(m->id == 1){
 		printf("Accelerometer has detected movement          \n");
 	}else if(m->id == 2){

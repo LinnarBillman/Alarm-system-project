@@ -19,8 +19,8 @@ int onFlag = 1;
 int16_t temp = 0;
 
 struct message {
-  int id;
-	int16_t num;
+  int8_t id;
+  int8_t num;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -148,7 +148,7 @@ PROCESS_THREAD(accel_process, ev, data)
   printf("temp: %d\n", temp);
 
   while(1) {
-    
+    printf("%d\n", onFlag);
     if(onFlag){
       x = adxl345.value(X_AXIS);
       y = adxl345.value(Y_AXIS);

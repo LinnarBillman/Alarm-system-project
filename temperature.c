@@ -7,8 +7,8 @@
 #define THRESHOLD 15
 
 struct message {
-	int id;
-	int16_t temp;
+	int8_t id;
+	int8_t temp;
 };
 
 int onFlag = 1;
@@ -40,6 +40,7 @@ PROCESS_THREAD(temp_process, ev, data) {
 	
 	static struct etimer et;
 	struct message m;
+	int16_t temperature;
 
 	SENSORS_ACTIVATE(tmp102);
 	
@@ -48,9 +49,8 @@ PROCESS_THREAD(temp_process, ev, data) {
 		PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
 		if(onFlag){
 
-			m.temp = tmp102_read_temp_raw();
-			m.temp = (m.temp >> 8);
-			//m.temp = tmp102.value(TMP102_READ);
+			temperature = tmp102_read_temp_raw();
+			m.temp = (temperature >> 8);
 			printf("temp is: %d\n", m.temp);
 			
 			if(m.temp >= THRESHOLD) {
