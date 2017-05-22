@@ -157,6 +157,7 @@ PROCESS_THREAD(accel_process, ev, data)
     	
     	if(((temp+15) <x) || ((temp-15) > x)){
     		 m.num = 2;
+		 m.id = 1;
     		 packetbuf_copyfrom(&m, sizeof(struct message));
        		 broadcast_send(&broadcast);
         		 printf("broadcasting\n");
