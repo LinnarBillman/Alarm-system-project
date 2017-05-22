@@ -55,7 +55,7 @@ PROCESS_THREAD(basestation_process, ev, data) {
 
 	struct message m;
 	while(1){
-		PROCESS_WAIT_EVENT_UNTIL(ev=sensors_event && data=button_sensor);
+		PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor);
 
 		if(onFlag){
 			m.id = 0;
