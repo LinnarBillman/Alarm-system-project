@@ -21,12 +21,12 @@ static void recv(struct broadcast_conn *c, const linkaddr_t *from) {
 
 	printf("Received broadcast from %d.%d with value %d\n", from->u8[0], from->u8[1], m->temp);
 	if(m->id==0){
-    if(m->temp==1){
-      onFlag = 1;
-    }else if(m->temp==0){
-      onFlag = 0;
-    }
-  }
+	    if(m->temp==1){
+	      onFlag = 1;
+	    }else if(m->temp==0){
+	      onFlag = 0;
+	    }
+  	}
 }
 
 static struct broadcast_conn broadcast;
