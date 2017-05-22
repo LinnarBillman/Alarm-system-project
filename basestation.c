@@ -61,13 +61,13 @@ PROCESS_THREAD(basestation_process, ev, data) {
 			m.id = 0;
 			m.num = 0;
 			packetbuf_copyfrom(&m, sizeof(struct message));
-			broadcast_send(&broadcast);
+			broadcast_send(&bc);
 			onFlag = 0;
 		}else{
 			m.id = 0;
 			m.num = 1;
 			packetbuf_copyfrom(&m, sizeof(struct message));
-			broadcast_send(&broadcast);
+			broadcast_send(&bc);
 			onFlag = 1;
 		}
 	}
