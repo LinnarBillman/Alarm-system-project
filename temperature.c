@@ -54,6 +54,7 @@ PROCESS_THREAD(temp_process, ev, data) {
 			printf("temp is: %d\n", m.temp);
 			
 			if(m.temp >= THRESHOLD) {
+				m.id = 2;
 				printf("Temp is higher than %d! Broadcasting...\n", THRESHOLD);
 				packetbuf_copyfrom(&m, sizeof(struct message));
 				broadcast_send(&broadcast);
